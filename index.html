@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VectorDB — HNSW + RAG</title>
+<title>SemanticVault — Vector Search Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -131,6 +131,7 @@ button {
 .ollama-status { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; font-size: 11px; line-height: 1.6; }
 .ollama-status.ok { border-color: rgba(166,227,161,.3); }
 .ollama-status.err { border-color: rgba(243,139,168,.3); }
+.ollama-status.demo-status { border-color: rgba(108,99,255,.35); }
 
 /* ── CHAT ── */
 .chat-history { display: flex; flex-direction: column; gap: 12px; }
@@ -164,7 +165,7 @@ button {
   <span class="badge hl">HNSW</span>
   <span class="badge">KD-TREE</span>
   <span class="badge">BRUTE FORCE</span>
-  <span class="badge" id="ollamaBadge">OLLAMA…</span>
+  <span class="badge" id="ollamaBadge">DEMO MODE</span>
   <span id="statsLabel">loading…</span>
 </header>
 
@@ -272,15 +273,23 @@ button {
     <!-- TAB: DOCUMENTS -->
     <div class="tab-content" id="tab-docs">
       <div>
-        <div class="sec">Ollama Status</div>
-        <div class="ollama-status" id="ollamaStatus">Checking…</div>
+        <div class="sec">Deployment Status</div>
+        <div class="ollama-status demo-status" id="ollamaStatus">
+          <span style="color:var(--accent)">● DEMO MODE</span><br><br>
+          <span style="color:var(--text)">This public deployment does not include Ollama.</span><br><br>
+          <span style="color:var(--green)">✓</span> Vector search and visualization are available.<br>
+          <span style="color:var(--green)">✓</span> HNSW, KD-Tree and Brute Force search are available.<br><br>
+          <span style="color:var(--red)">⚠</span> Document embedding and RAG require Ollama with
+          <span style="color:var(--accent)">nomic-embed-text</span> and
+          <span style="color:var(--accent)">llama3.2</span> when running SemanticVault locally.
+        </div>
       </div>
       <div>
         <div class="sec">Insert Document</div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <input type="text" id="docTitle" placeholder="Document title / topic…" />
-          <textarea id="docText" placeholder="Paste your notes, textbook excerpt, lecture content…&#10;&#10;Long text is automatically split into overlapping chunks and each chunk gets its own real embedding via Ollama's nomic-embed-text model."></textarea>
-          <button class="btn-g" id="insertDocBtn" onclick="insertDocument()">⚡ EMBED &amp; INSERT</button>
+          <textarea id="docText" placeholder="Paste your notes, textbook excerpt, lecture content…&#10;&#10;Document embedding requires Ollama when running SemanticVault locally. The public demo focuses on vector search and visualization."></textarea>
+          <button class="btn-g" id="insertDocBtn" onclick="insertDocument()">⚠ REQUIRES OLLAMA</button>
           <div id="insertStatus" style="font-size:11px;color:var(--muted)"></div>
         </div>
       </div>
@@ -304,9 +313,11 @@ button {
               <option value="3" selected>Top 3</option>
               <option value="5">Top 5</option>
             </select>
-            <button class="btn-g" id="askBtn" onclick="askAI()" style="flex:1">🤖 ASK AI</button>
+            <button class="btn-g" id="askBtn" onclick="askAI()" style="flex:1">⚠ REQUIRES OLLAMA</button>
           </div>
-          <div style="font-size:10px;color:var(--muted)">Uses your inserted documents as context. Answers come from the local LLM.</div>
+          <div style="font-size:10px;color:var(--muted)">
+            RAG uses Ollama locally. This public demo does not include an Ollama instance.
+          </div>
         </div>
       </div>
       <div>
@@ -638,66 +649,28 @@ async function deleteItem(id) {
 //  DOCUMENT MANAGEMENT
 // ════════════════════════════════════════════════════════════
 async function checkOllamaStatus() {
-  try {
-    const r=await fetch(API+'/status'), d=await r.json();
-    const badge=document.getElementById('ollamaBadge');
-    const box=document.getElementById('ollamaStatus');
-    if (d.ollamaAvailable) {
-      badge.className='badge ok'; badge.textContent='OLLAMA ✓';
-      box.className='ollama-status ok';
-      box.innerHTML=`<span style="color:var(--green)">● Online</span><br>`+
-        `Embed: <span style="color:var(--accent)">${d.embedModel}</span><br>`+
-        `Generate: <span style="color:var(--accent)">${d.genModel}</span><br>`+
-        `Dims: <span style="color:var(--muted)">${d.docDims||'(first insert sets this)'}</span><br>`+
-        `Documents: <span style="color:var(--text)">${d.docCount}</span>`;
-    } else {
-      badge.className='badge err'; badge.textContent='OLLAMA ✗';
-      box.className='ollama-status err';
-      box.innerHTML=`<span style="color:var(--red)">● Offline</span><br><br>`+
-        `To enable RAG features:<br>`+
-        `<span style="color:var(--muted)">1. Install from ollama.com<br>`+
-        `2. ollama pull nomic-embed-text<br>`+
-        `3. ollama pull llama3.2</span>`;
-    }
-  } catch(_) {}
+  const badge = document.getElementById('ollamaBadge');
+  const box = document.getElementById('ollamaStatus');
+
+  badge.className = 'badge hl';
+  badge.textContent = 'DEMO MODE';
+
+  box.className = 'ollama-status demo-status';
+  box.innerHTML =
+    `<span style="color:var(--accent)">● Demo Mode</span><br><br>` +
+    `<span style="color:var(--text)">This public deployment does not include Ollama.</span><br><br>` +
+    `<span style="color:var(--green)">✓</span> Vector search and visualization are available.<br>` +
+    `<span style="color:var(--green)">✓</span> HNSW, KD-Tree and Brute Force search are available.<br><br>` +
+    `<span style="color:var(--red)">⚠</span> Document embedding and RAG require Ollama with ` +
+    `<span style="color:var(--accent)">nomic-embed-text</span> and ` +
+    `<span style="color:var(--accent)">llama3.2</span> when running SemanticVault locally.`;
 }
 
 async function insertDocument() {
-  const title=document.getElementById('docTitle').value.trim();
-  const text=document.getElementById('docText').value.trim();
-  const btn=document.getElementById('insertDocBtn');
-  const status=document.getElementById('insertStatus');
-  if(!title||!text){status.textContent='⚠ Need both a title and text.';return;}
-
-  btn.disabled=true; btn.textContent='Embedding…';
-  status.innerHTML='<span style="color:var(--muted)">Calling Ollama nomic-embed-text…</span>';
-
-  try {
-    const r=await fetch(API+'/doc/insert',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({title,text})
-    });
-    const d=await r.json();
-    if (d.error) {
-      status.innerHTML=`<span style="color:var(--red)">✗ ${d.error}</span>`;
-    } else {
-      status.innerHTML=`<span style="color:var(--green)">✓ Inserted ${d.chunks} chunk(s) · ${d.dims}D embeddings</span>`;
-      document.getElementById('docTitle').value='';
-      document.getElementById('docText').value='';
-
-          // Insert a 16D fake vector into the visualizer DB so it shows up on the map
-          const emb16 = textToEmbedding(title + ' ' + text);
-          fetch(API+'/insert', {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({metadata: title, category: 'doc', embedding: emb16})
-          }).then(() => { loadItems().then(loadHNSW); });
-
-      loadDocList(); checkOllamaStatus();
-    }
-  } catch(_) {
-    status.innerHTML='<span style="color:var(--red)">✗ Server error</span>';
-  }
-  btn.disabled=false; btn.textContent='⚡ EMBED & INSERT';
+  const status = document.getElementById('insertStatus');
+  status.innerHTML =
+    '<span style="color:var(--red)">⚠ Document embedding is not available in the public demo.</span><br>' +
+    '<span style="color:var(--muted)">Run SemanticVault locally with Ollama and the nomic-embed-text model to use this feature.</span>';
 }
 
 async function loadDocList() {
@@ -735,111 +708,16 @@ document.getElementById('ragQuestion').addEventListener('keydown',e=>{
 });
 
 async function askAI() {
-  const question=document.getElementById('ragQuestion').value.trim();
-  if(!question)return;
-  const k=parseInt(document.getElementById('ragK').value);
-  const btn=document.getElementById('askBtn');
-  btn.disabled=true; btn.textContent='Thinking…';
-
-  const history=document.getElementById('chatHistory');
-  // Clear previous conversation
-  history.innerHTML='';
-
-  // Show question bubble
-  const qDiv=document.createElement('div'); qDiv.className='chat-q';
-  qDiv.textContent=question; history.appendChild(qDiv);
-
-  // Show thinking indicator
-  const thinkDiv=document.createElement('div'); thinkDiv.className='thinking';
-  thinkDiv.innerHTML='<div class="spinner"></div>Retrieving context & generating answer…';
-  history.appendChild(thinkDiv);
-  history.scrollTop=history.scrollHeight;
-
-  // Update the scatter plot visualizer in the background using the real 768D DB
-  fetch(API+'/doc/search', {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({question, k})
-  })
-  .then(res=>res.json())
-  .then(data => {
-    if (data.contexts && data.contexts.length > 0) {
-      hitIds = new Set();
-      let sx=0, sy=0, sw=0;
-      data.contexts.forEach((ctx, i) => {
-        // Match the RAG chunk title back to the visualizer document metadata
-        const pt = pcaPoints.find(p => p.item.category === 'doc' && ctx.title.startsWith(p.item.metadata));
-        if (pt) {
-          hitIds.add(pt.item.id);
-          const w = 1/(i+1); sx += pt.x*w; sy += pt.y*w; sw += w;
-        }
-      });
-      if (sw > 0) queryPt = {x: sx/sw + (Math.random()-.5)*.015, y: sy/sw + (Math.random()-.5)*.015};
-    } else {
-      hitIds = new Set();
-      // Fallback: If no RAG docs match, visually move the star to the 16D semantic space anyway!
-      const emb16 = textToEmbedding(question);
-      fetch(`${API}/search?v=${emb16.join(',')}&k=3&metric=cosine&algo=hnsw`)
-        .then(res2=>res2.json())
-        .then(data2 => {
-          if (data2.results && data2.results.length>0) {
-            let sx=0,sy=0,sw=0;
-            for (let i=0;i<Math.min(3,data2.results.length);i++) {
-              const pt=pcaPoints.find(p=>p.item.id===data2.results[i].id);
-              if(pt){const w=1/(i+1);sx+=pt.x*w;sy+=pt.y*w;sw+=w;}
-            }
-            if(sw>0) queryPt={x:sx/sw+(Math.random()-.5)*.015,y:sy/sw+(Math.random()-.5)*.015};
-          }
-        }).catch(()=>{});
-    }
-  }).catch(()=>{});
-
-  try {
-    const r=await fetch(API+'/doc/ask',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question,k})
-    });
-    const d=await r.json();
-    thinkDiv.remove();
-
-    const aDiv=document.createElement('div'); aDiv.className='chat-a';
-
-    if (d.error) {
-      aDiv.innerHTML=`<div class="chat-a-label">ERROR</div><div class="chat-a-text" style="color:var(--red)">${d.error}</div>`;
-    } else {
-      // Build answer block with typewriter
-      aDiv.innerHTML=`<div class="chat-a-label">🤖 ${d.model||'llm'}</div>`+
-        `<div class="chat-a-text" id="typeTarget"></div>`+
-        `<div class="chat-ctx">`+
-          `<div class="chat-ctx-label">RETRIEVED CONTEXT (${d.contexts.length} chunks)</div>`+
-          d.contexts.map((c,i)=>`<span class="ctx-chip" onclick="toggleCtx(${i})">#${i+1} ${c.title} · ${c.distance.toFixed(3)}</span>`+
-            `<div class="ctx-expand" id="ctx-${i}">${c.text}</div>`).join('')+
-        `</div>`;
-      history.appendChild(aDiv);
-
-      // Typewriter effect
-      const target=aDiv.querySelector('#typeTarget');
-      target.classList.add('typing');
-      const full=d.answer; let i=0;
-      const timer=setInterval(()=>{
-        if(i>=full.length){clearInterval(timer);target.classList.remove('typing');return;}
-        const chunk=full.slice(i,i+3); target.textContent+=chunk; i+=3;
-        history.scrollTop=history.scrollHeight;
-      },18);
-    }
-
-    if (!d.error) { /* already appended above */ }
-    else history.appendChild(aDiv);
-
-  } catch(e) {
-    thinkDiv.remove();
-    const err=document.createElement('div');err.className='chat-a';
-    err.innerHTML='<div class="chat-a-label">ERROR</div><div class="chat-a-text" style="color:var(--red)">Server error — is the backend running?</div>';
-    history.appendChild(err);
-  }
-
-  document.getElementById('ragQuestion').value='';
-  btn.disabled=false; btn.textContent='🤖 ASK AI';
-  history.scrollTop=history.scrollHeight;
+  const history = document.getElementById('chatHistory');
+  history.innerHTML =
+    '<div class="chat-a">' +
+      '<div class="chat-a-label">DEMO MODE</div>' +
+      '<div class="chat-a-text" style="color:var(--text)">' +
+        'AI/RAG is not available in this public deployment because Ollama is not running here.<br><br>' +
+        'To use document embedding and local LLM answers, run SemanticVault locally with Ollama, ' +
+        'nomic-embed-text, and llama3.2.' +
+      '</div>' +
+    '</div>';
 }
 
 function toggleCtx(i) {
