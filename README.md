@@ -4,51 +4,68 @@
 
 The project provides an interactive web interface for exploring **Approximate Nearest Neighbor (ANN) search, semantic embeddings, vector similarity, and Retrieval-Augmented Generation (RAG)** while comparing different vector search techniques.
 
-> **Note:** The project repository contains the complete SemanticVault system, including the Ollama-powered embedding and RAG pipeline. The publicly deployed version is a lightweight **demo build** focused on the core vector search and visualization functionality. The complete system can be run locally with Ollama.
+> **Project Status:** SemanticVault is an actively evolving project. The repository contains the complete system, including the local Ollama-powered embedding and RAG pipeline. The publicly deployed version is a lightweight demo build focused on the core vector search and visualization functionality.
 
 
 ## 🚀 Live Demo
 
 **[🌐 Open SemanticVault Live Demo](https://semanticvault-production.up.railway.app)**
 
-The live deployment provides a lightweight demonstration of the core SemanticVault search engine.
+The live deployment provides a lightweight demonstration of the core SemanticVault search engine and can be explored directly in the browser without any local setup.
 
 ### What you can explore in the deployed demo
 
-- HNSW vector search
-- KD-Tree search
-- Brute Force similarity search
-- Cosine similarity
-- Interactive vector-space visualization
-- PCA projection
-- Search across built-in demo vectors
-- Algorithm comparison and benchmarking
+- ⚡ HNSW vector search
+- 🌲 KD-Tree search
+- 🔎 Brute Force similarity search
+- 🎯 Cosine similarity
+- 📊 Interactive vector-space visualization
+- 📈 PCA projection
+- 🔍 Search across built-in demo vectors
+- ⚙️ Algorithm comparison and benchmarking
 
-### About the Demo Version
+### About the Deployed Demo
 
-The public deployment is intentionally configured as a **demo environment** and does not run the local Ollama models.
+The public deployment is intentionally configured as a **demo environment**.
+
+It does **not** run the local Ollama models because the complete AI pipeline is designed to run locally.
 
 Therefore, the following features require the complete project to be run locally with Ollama:
 
-- Document embedding
-- Document ingestion using local embeddings
-- LLM-powered RAG
-- AI-assisted document querying
+- 📄 Document ingestion
+- 🧠 Local document embeddings
+- 🤖 LLM-powered querying
+- 🔎 Retrieval-Augmented Generation (RAG)
+- 💬 AI-assisted document querying
 
-This separation keeps the public demo lightweight while allowing the complete project to use local LLMs without requiring a cloud-hosted model.
+The deployed version is therefore intended to provide a quick way to explore the core search engine, while the local version demonstrates the complete SemanticVault pipeline.
 
 
-## 🎥 Full Project Demonstration
+## 🎥 Project Demo
 
-The complete SemanticVault system, including the **Ollama-powered embedding and RAG pipeline**, is demonstrated in the project video.
+The following video demonstrates the **complete SemanticVault application running locally**, including the local AI pipeline.
 
-> **The deployed demo and the video serve different purposes:**
+**[▶️ Watch the SemanticVault Project Demo](https://youtu.be/eyaN-p13x5c)**
+
+![SemanticVault Demo](<img width="1847" height="967" alt="image" src="https://github.com/user-attachments/assets/6fe7ce14-c4bc-4ae3-b560-d48b199216f7" />
+)
+
+The demo shows:
+
+- Semantic vector search
+- HNSW, KD-Tree, and Brute Force search
+- Search latency and top-k retrieval
+- 2D PCA visualization of the vector space
+- Document ingestion
+- Local embedding generation using Ollama
+- Document retrieval
+- LLM-powered querying and RAG
+
+> **Note:** The deployed demo and the project demo video serve different purposes.
 >
-> 🌐 **Live Demo:** Explore the core vector search engine and interactive visualization directly in your browser.
+> 🌐 **Live Demo:** A lightweight browser-based version for exploring the core vector search and visualization features.
 >
-> 🎥 **Project Video:** See the complete SemanticVault system running locally, including document embedding, Ollama integration, and RAG functionality.
-
-**Demo video/GIF:** *Coming soon*
+> 🎥 **Project Demo:** The complete system running locally, including document embedding, Ollama integration, and RAG.
 
 
 # ✨ Features
@@ -94,8 +111,8 @@ The complete SemanticVault system, including the **Ollama-powered embedding and 
 | **C++17** | Core search engine and backend |
 | **HNSW** | Approximate nearest-neighbor search |
 | **KD-Tree** | Spatial nearest-neighbor search |
-| **Ollama** | Local LLM runtime |
-| **Llama 3.2** | Local language model |
+| **Ollama** | Local AI model runtime |
+| **Llama 3.2** | Local language model for RAG |
 | **Nomic Embed Text** | Semantic embedding generation |
 | **HTTP Server** | C++ web backend |
 | **HTML / CSS / JavaScript** | Interactive frontend |
@@ -106,32 +123,32 @@ The complete SemanticVault system, including the **Ollama-powered embedding and 
 
 ```text
                          ┌─────────────────────┐
-                         │      Browser        │
-                         │  Web Interface      │
+                         │       Browser       │
+                         │    Web Interface    │
                          └──────────┬──────────┘
                                     │
                                     ▼
                          ┌─────────────────────┐
                          │    HTTP Server      │
-                         │       C++           │
+                         │        C++          │
                          └──────────┬──────────┘
                                     │
-                    ┌───────────────┼───────────────┐
-                    │               │               │
-                    ▼               ▼               ▼
-              ┌──────────┐   ┌──────────┐   ┌────────────┐
-              │   HNSW   │   │ KD-Tree  │   │ Brute Force│
-              └──────────┘   └──────────┘   └────────────┘
-                    │               │               │
-                    └───────────────┼───────────────┘
+                  ┌─────────────────┼─────────────────┐
+                  │                 │                 │
+                  ▼                 ▼                 ▼
+            ┌──────────┐      ┌──────────┐     ┌─────────────┐
+            │   HNSW   │      │ KD-Tree  │     │ Brute Force │
+            └──────────┘      └──────────┘     └─────────────┘
+                  │                 │                 │
+                  └─────────────────┼─────────────────┘
                                     │
                                     ▼
                          ┌─────────────────────┐
                          │   Vector Search     │
-                         │  & Similarity       │
+                         │   & Similarity      │
                          └──────────┬──────────┘
                                     │
-                          Local AI Pipeline
+                           Local AI Pipeline
                                     │
                                     ▼
                          ┌─────────────────────┐
@@ -140,10 +157,10 @@ The complete SemanticVault system, including the **Ollama-powered embedding and 
                                     │
                          ┌──────────┴──────────┐
                          ▼                     ▼
-                 ┌───────────────┐     ┌────────────┐
-                 │nomic-embed-   │     │ llama3.2   │
-                 │text           │     │            │
-                 └───────────────┘     └────────────┘
-                         │                     │
-                         ▼                     ▼
-                    Embeddings              RAG / AI
+                  ┌───────────────┐     ┌────────────┐
+                  │nomic-embed-   │     │  llama3.2  │
+                  │text           │     │            │
+                  └───────┬───────┘     └─────┬──────┘
+                          │                   │
+                          ▼                   ▼
+                     Embeddings            RAG / AI
